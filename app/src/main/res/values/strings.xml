@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name" translatable="false">Tamago</string>
+    <string name="MMStart">Play</string>
+    <string name="MMBest">Best result</string>
+    <string name="NoMoney">Not enough money</string>
+    <string name="SFood">Foods</string>
+    <string name="SThirst">Drinks</string>
+    <string name="SBoredom">Entertainments</string>
+    <string name="SHealth">Health</string>
+    <string name="SMoney">Money</string>
+    <string name="MMAbout">About</string>
+    <string name="PMM">Main menu</string>
+    <string name="ASources">Sources used</string>
+    <string name="ErrorS">Save error</string>
+    <string name="SMoneyError">Not enough money</string>
+    <string name="Time">Score:</string>
+    <string name="Load" translatable="false">Loading</string>
+    <string name="Reset">Restart</string>
+    <string name="Reseted">Rebooted</string>
+    <string name="End">You die</string>
+    <string name="Best">Best result:</string>
+    <string name="FIT1">Water | 20</string>
+    <string name="FIT3">Pizza | 40</string>
+    <string name="FIT2">Juice | 25</string>
+    <string name="FIT4">Cake | 100</string>
+    <string name="FIT5">Salad | 100</string>
+    <string name="FIT7">Tako | 150</string>
+    <string name="FIT8">Borsh | 200</string>
+    <string name="FIT6">Coffee | 125</string>
+    <string name="HIT1">Sleep | priceless</string>
+    <string name="HIT3">Use ointment | 20</string>
+    <string name="HIT4">Visit the gym | 60</string>
+    <string name="HIT6">Drink expensive pills | 170</string>
+    <string name="HIT5">Use expensive ointment | 150</string>
+    <string name="HIT7">Visit the massage session | 180</string>
+    <string name="HIT8">Visit the sanatorium | 500</string>
+    <string name="HIT2">Play basketball | priceless</string>
+    <string name="Contact">Contact:</string>
+</resources>
