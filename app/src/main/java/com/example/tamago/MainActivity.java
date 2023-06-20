@@ -19,16 +19,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed() {// disable back button
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "SourceLockedOrientationActivity"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                SharedPreferences pref = getSharedPreferences("Stat", Context.MODE_PRIVATE);
+                SharedPreferences pref = getSharedPreferences(Constants.SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE);
                 pref.edit().clear().apply();
                 Toast.makeText(getApplicationContext(), R.string.Reseted, Toast.LENGTH_LONG).show();
             }

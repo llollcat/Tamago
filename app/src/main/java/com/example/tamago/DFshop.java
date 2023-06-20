@@ -6,55 +6,44 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 public class DFshop extends Activity {
+    private final SharedPreferences sharedStatistic = getSharedPreferences(Constants.SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE);
+    GameStatistic gameStatistic = new GameStatistic();
 
+    public void save(String name, int value, String string, boolean isSavingString) {
+        SharedPreferences.Editor statisticEditor = getSharedPreferences(Constants.SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE).edit();
+        if (isSavingString)
+            statisticEditor.putString(name, string);
 
-    private SharedPreferences tosaveorload;
+        else
+            statisticEditor.putInt(name, value);
+        statisticEditor.apply();
+    }
 
-    void save(String name, int value, String string, boolean opcode) {
-        tosaveorload = getSharedPreferences("Stat", Context.MODE_PRIVATE);
-        if (opcode) {
-            SharedPreferences.Editor editor = tosaveorload.edit();
-            editor.putString(name, string);
-            editor.apply();
-
-        } else {
-            SharedPreferences.Editor editor = tosaveorload.edit();
-            editor.putInt(name, value);
-            editor.apply();
-
-        }
-
+    void load() {
+        gameStatistic.setHunger(sharedStatistic.getInt("hunger", GameStatistic.maxStat));
+        gameStatistic.setThirst(sharedStatistic.getInt("thirst", GameStatistic.maxStat));
+        gameStatistic.setBoredom(sharedStatistic.getInt("boredom", GameStatistic.maxStat));
+        gameStatistic.setHealth(sharedStatistic.getInt("health", GameStatistic.maxStat));
+        gameStatistic.decreaseMoney(Double.parseDouble(Objects.requireNonNull(sharedStatistic.getString("money", "1000.00"))));
 
     }
 
     @SuppressLint("SetTextI18n")
-    void setmoneytext(TextView money) {
-        money.setText(Double.toString(stat.money));
-
+    void setMoneyText(TextView money) {
+        money.setText(Double.toString(gameStatistic.getMoney()));
     }
 
-    Stat stat = new Stat();
 
 
-    void load() {
-
-
-        stat.hunger = tosaveorload.getInt("hunger", stat.maxStat);
-        stat.thirst = tosaveorload.getInt("thirst", stat.maxStat);
-        stat.boredom = tosaveorload.getInt("boredom", stat.maxStat);
-        stat.health = tosaveorload.getInt("health", stat.maxStat);
-        stat.money = Double.parseDouble(tosaveorload.getString("money", "1000.00"));
-        Log.i("?!?", "run: данные должны быть загруженны");
-
-    }
 
     void buttonl(final TextView money, int bid, int tid, final double coast, final int t, final int hun, final int heal, final int bor) {
         Button it1 = findViewById(bid);
@@ -62,12 +51,12 @@ public class DFshop extends Activity {
         it1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (stat.setMoney(coast, getApplicationContext())) {
-                    setmoneytext(money);
-                    stat.setThirst(-t);
-                    stat.setHunger(-hun);
-                    stat.setHealth(-heal);
-                    stat.setBoredom(-bor);
+                if (gameStatistic.decreaseMoney(coast)) {
+                    setMoneyText(money);
+                    gameStatistic.setThirst(-t);
+                    gameStatistic.setHunger(-hun);
+                    gameStatistic.setHealth(-heal);
+                    gameStatistic.setBoredom(-bor);
                 }
 
             }
@@ -76,23 +65,23 @@ public class DFshop extends Activity {
     }
 
 
+    @SuppressLint("SourceLockedOrientationActivity")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        tosaveorload = getSharedPreferences("Stat", Context.MODE_PRIVATE);
-        stat.money = Double.parseDouble(tosaveorload.getString("money", "1000.00"));
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+        gameStatistic.decreaseMoney(Double.parseDouble(Objects.requireNonNull(sharedStatistic.getString("money", "1000.00"))));
         setContentView(R.layout.dfshop);
         TextView money = findViewById(R.id.dfmoney);
-        setmoneytext(money);
+        setMoneyText(money);
         load();
 
-        // Еда из магазина
+        // список еды из магазина
         buttonl(money, R.id.it1, R.string.FIT1, 20.0, 30, 0, 0, 0);
         buttonl(money, R.id.it2, R.string.FIT2, 26.0, 3, 10, 0, 0);
         buttonl(money, R.id.it3, R.string.FIT3, 40.0, -5, 27, -2, 0);
@@ -113,11 +102,10 @@ public class DFshop extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        save("hunger", stat.hunger, "", false);
-        save("thirst", stat.thirst, "", false);
-        save("boredom", stat.boredom, "", false);
-        save("health", stat.health, "", false);
-        save("money", 0, Double.toString(stat.getMoney()), true);
-        Log.i("?!?", "pause: Данные должны быть сохранены ");
+        save("hunger", gameStatistic.getHunger(), "", false);
+        save("thirst", gameStatistic.getThirst(), "", false);
+        save("boredom", gameStatistic.getBoredom(), "", false);
+        save("health", gameStatistic.getHealth(), "", false);
+        save("money", 0, Double.toString(gameStatistic.getMoney()), true);
     }
 }

@@ -17,35 +17,28 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 
 public class Game extends Activity {
+
+    private final SharedPreferences sharedStatistic = getSharedPreferences(Constants.SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE);
+
     Integer decrease = 0;
     Boolean work = false;
     Boolean loadpls = false;
     Boolean killtread = false;
-    Stat stat = new Stat();
-    Ent ent = new Ent();
+    GameStatistic gameStatistic = new GameStatistic();
+    Mood mood = new Mood();
     Boolean yasdoh = false;
 
 
-    private SharedPreferences tosaveorload;
+    public void save(String name, int value, String string, boolean isSavingString) {
+        SharedPreferences.Editor statisticEditor = getSharedPreferences(Constants.SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE).edit();
+        if (isSavingString) statisticEditor.putString(name, string);
 
-
-    void save(String name, int value, String string, boolean opcode) {
-        tosaveorload = getSharedPreferences("Stat", Context.MODE_PRIVATE);
-        if (opcode) {
-            SharedPreferences.Editor editor = tosaveorload.edit();
-            editor.putString(name, string);
-            editor.apply();
-
-        } else {
-            SharedPreferences.Editor editor = tosaveorload.edit();
-            editor.putInt(name, value);
-            editor.apply();
-
-        }
-
-
+        else statisticEditor.putInt(name, value);
+        statisticEditor.apply();
     }
 
 
@@ -69,19 +62,18 @@ public class Game extends Activity {
                 TextView time = findViewById(R.id.GTime);
                 TextView money = findViewById(R.id.GMoney);
                 TextView emoji = findViewById(R.id.GEnt);
-                tosaveorload = getSharedPreferences("Stat", Context.MODE_PRIVATE);
                 int isneed = 1;
                 while (!killtread) {
 
 
                     if (loadpls) {
-                        stat.pasttime = tosaveorload.getInt("pasttime", 0);
-                        stat.hunger = tosaveorload.getInt("hunger", Stat.maxStat);
-                        stat.thirst = tosaveorload.getInt("thirst", Stat.maxStat);
-                        stat.boredom = tosaveorload.getInt("boredom", Stat.maxStat);
-                        stat.health = tosaveorload.getInt("health", Stat.maxStat);
-                        stat.money = Double.parseDouble(tosaveorload.getString("money", "750.0"));
-                        decrease = tosaveorload.getInt("decrease", 1);
+                        gameStatistic.setPlayTime(sharedStatistic.getInt("pasttime", 0));
+                        gameStatistic.setHunger(sharedStatistic.getInt("hunger", GameStatistic.maxStat));
+                        gameStatistic.setThirst(sharedStatistic.getInt("thirst", GameStatistic.maxStat));
+                        gameStatistic.setBoredom( sharedStatistic.getInt("boredom", GameStatistic.maxStat));
+                        gameStatistic.setHealth(sharedStatistic.getInt("health", GameStatistic.maxStat));
+                        gameStatistic.decreaseMoney(Double.parseDouble(Objects.requireNonNull(sharedStatistic.getString("money", "750.0"))));
+                        decrease = sharedStatistic.getInt("decrease", 1);
                         Log.i("?!?", "run: данные должны быть загруженны");
                         loadpls = false;
                     }
@@ -89,39 +81,38 @@ public class Game extends Activity {
                     if (work) {
 
 
-                        stat.setBoredom(decrease);
-                        GBoredom.setProgress(stat.getBoredom());
+                        gameStatistic.setBoredom(decrease);
+                        GBoredom.setProgress(gameStatistic.getBoredom());
 
-                        stat.setHunger(decrease);
-                        GHunger.setProgress(stat.getHunger());
+                        gameStatistic.setHunger(decrease);
+                        GHunger.setProgress(gameStatistic.getHunger());
 
-                        stat.setThirst(decrease);
-                        GThirst.setProgress(stat.getThirst());
+                        gameStatistic.setThirst(decrease);
+                        GThirst.setProgress(gameStatistic.getThirst());
 
-                        stat.setHealth(decrease);
-                        GHealth.setProgress(stat.getHealth());
+                        gameStatistic.setHealth(decrease);
+                        GHealth.setProgress(gameStatistic.getHealth());
 
 
-                        time.setText((Integer.toString(stat.getPasttime())));
+                        time.setText((Integer.toString(gameStatistic.getPlayTime())));
 
-                        money.setText(Double.toString(stat.getMoney()));
+                        money.setText(Double.toString(gameStatistic.getMoney()));
 
 
                         // установщик emoji и умиратель
 
-                        if (stat.hunger <= 0 || stat.thirst <= 0 || stat.boredom <= 0 || stat.health <= 0) {
-                            tosaveorload.edit().clear().apply();
+                        if (gameStatistic.getHunger() <= 0 || gameStatistic.getThirst() <= 0 || gameStatistic.getBoredom() <= 0 || gameStatistic.getHealth() <= 0) {
+                            sharedStatistic.edit().clear().apply();
 
-                            SharedPreferences best = getSharedPreferences("BestR", Context.MODE_PRIVATE);
+                            SharedPreferences best = getSharedPreferences(Constants.SHARED_PREFERENCE_BEST_SCORE, Context.MODE_PRIVATE);
                             yasdoh = true;
-                            Log.i("?!?", "run: Умер мужык ");
 
 
                             killtread = true;
-                            if (stat.pasttime > best.getInt("BestR", 0)) {
+                            if (gameStatistic.getPlayTime() > best.getInt(Constants.SHARED_PREFERENCE_BEST_SCORE, 0)) {
 
                                 SharedPreferences.Editor editor = best.edit();
-                                editor.putInt("BestR", stat.pasttime);
+                                editor.putInt(Constants.SHARED_PREFERENCE_BEST_SCORE, gameStatistic.getPlayTime());
                                 editor.apply();
 
 
@@ -136,22 +127,22 @@ public class Game extends Activity {
 
                             startActivity(new Intent(Game.this, MainActivity.class));
 
-
+                        // todo переделать
                         } else {
-                            if (stat.hunger < 40 || stat.thirst < 40) {
-                                emoji.setText(ent.discontent);
+                            if (gameStatistic.getHunger() < 40 || gameStatistic.getThirst() < 40) {
+                                emoji.setText(mood.dissatisfaction);
                             } else {
-                                if (stat.health < 40) {
-                                    emoji.setText((ent.pain));
+                                if (gameStatistic.getHealth() < 40) {
+                                    emoji.setText((mood.pain));
 
                                 } else {
-                                    if (stat.boredom < 40) {
-                                        emoji.setText(ent.sleep);
+                                    if (gameStatistic.getBoredom() < 40) {
+                                        emoji.setText(mood.sleep);
                                     } else {
-                                        if (stat.hunger < 75 && stat.thirst < 75 && stat.health < 75 && stat.boredom < 75) {
-                                            emoji.setText(ent.normal);
+                                        if (gameStatistic.getHunger() < 75 && gameStatistic.getThirst() < 75 && gameStatistic.getHealth() < 75 && gameStatistic.getBoredom() < 75) {
+                                            emoji.setText(mood.normal);
                                         } else {
-                                            emoji.setText(ent.joy);
+                                            emoji.setText(mood.joy);
                                         }
                                     }
 
@@ -160,7 +151,7 @@ public class Game extends Activity {
                         }
 
 
-                        stat.setPasttime(decrease);
+                        gameStatistic.setPlayTime(decrease);
                         if (isneed >= 60 * decrease) {
                             decrease++;
                         }
@@ -192,13 +183,11 @@ public class Game extends Activity {
         // Установка вида
         {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         }
 
-        Log.i("?!?", "onCreate: ");
         setContentView(R.layout.maingame);
         treaddecreaser();
 
@@ -206,7 +195,7 @@ public class Game extends Activity {
         GWork.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stat.setMoney(-1.0, Game.this);
+                gameStatistic.decreaseMoney(-1.0);
 
             }
         });
@@ -247,7 +236,6 @@ public class Game extends Activity {
         super.onResume();
 
 
-        Log.i("?!?", "resume: ");
         // Загрузка и начало работы цикла в треде
         loadpls = true;
         work = true;
@@ -261,14 +249,13 @@ public class Game extends Activity {
 
         work = false; // отключение цикла в треде
         if (!yasdoh) {
-            save("pasttime", stat.pasttime, "", false);
-            save("hunger", stat.hunger, "", false);
-            save("thirst", stat.thirst, "", false);
-            save("boredom", stat.boredom, "", false);
-            save("health", stat.health, "", false);
-            save("money", 0, Double.toString(stat.getMoney()), true);
+            save("pasttime", gameStatistic.getPlayTime(), "", false);
+            save("hunger", gameStatistic.getHunger(), "", false);
+            save("thirst", gameStatistic.getThirst(), "", false);
+            save("boredom", gameStatistic.getBoredom(), "", false);
+            save("health", gameStatistic.getHealth(), "", false);
+            save("money", 0, Double.toString(gameStatistic.getMoney()), true);
             save("decrease", decrease, "", false);
-            Log.i("?!?", "pause: Данные должны быть сохранены ");
         }
 
 
