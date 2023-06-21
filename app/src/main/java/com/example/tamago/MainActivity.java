@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 GameStatistic gameStatistic = GameStatistic.getInstance(getApplicationContext());
-                gameStatistic.wipeStatistic();
+                gameStatistic.wipeStatisticWithOutPlayTime();
 
                 Toast.makeText(getApplicationContext(), R.string.Reseted, Toast.LENGTH_LONG).show();
             }

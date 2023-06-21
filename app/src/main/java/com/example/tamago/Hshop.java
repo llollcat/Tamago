@@ -15,7 +15,7 @@ import java.util.Objects;
 public class Hshop extends Activity {
     GameStatistic gameStatistic;
 
-    void shopItemButton(final TextView money, int bid, int tid, final double coast, final int t, final int hun, final int heal, final int bor) {
+    void shopItemButton(final TextView money, int bid, int tid, final int coast, final int t, final int hun, final int heal, final int bor) {
         Button it1 = findViewById(bid);
         it1.setText(tid);
         it1.setOnClickListener(new View.OnClickListener() {
@@ -27,7 +27,7 @@ public class Hshop extends Activity {
                     gameStatistic.decreaseHealth(-heal);
                     gameStatistic.decreaseBoredom(-bor);
                     TextView money = findViewById(R.id.dfmoney);
-                    money.setText(Double.toString(gameStatistic.getMoney()));
+                    money.setText(gameStatistic.getStringMoney());
                 }
 
             }
@@ -49,7 +49,7 @@ public class Hshop extends Activity {
 
         setContentView(R.layout.dfshop);
         TextView money = findViewById(R.id.dfmoney);
-        money.setText(Double.toString(gameStatistic.getMoney()));
+        money.setText(gameStatistic.getStringMoney());
 
 
         // сон

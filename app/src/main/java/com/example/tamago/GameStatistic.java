@@ -3,8 +3,6 @@ package com.example.tamago;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.Objects;
-
 public class GameStatistic {
     public final static Integer MAX_STAT = 100;
     public final static String SHARED_PREFERENCE_STATISTIC = "Statistic";
@@ -16,7 +14,7 @@ public class GameStatistic {
     private Integer thirst = MAX_STAT;
     private Integer health = MAX_STAT;
     private Integer boredom = MAX_STAT;
-    private Double money;
+    private Integer money;
 
     private Boolean isWasLoaded = false;
 
@@ -63,7 +61,7 @@ public class GameStatistic {
         this.setThirst(sharedStatistic.getInt("thirst", GameStatistic.MAX_STAT));
         this.setBoredom(sharedStatistic.getInt("boredom", GameStatistic.MAX_STAT));
         this.setHealth(sharedStatistic.getInt("health", GameStatistic.MAX_STAT));
-        this.setMoney(Double.parseDouble(Objects.requireNonNull(sharedStatistic.getString("money", "1000.00"))));
+        this.setMoney(sharedStatistic.getInt("money", 1000));
         this.setStatModifier(sharedStatistic.getInt("statModifier", 1));
         isWasLoaded = true;
     }
@@ -81,7 +79,7 @@ public class GameStatistic {
         statisticEditor.putInt("thirst", this.getThirst());
         statisticEditor.putInt("boredom", this.getBoredom());
         statisticEditor.putInt("health", this.getHealth());
-        statisticEditor.putString("money", Double.toString(this.getMoney()));
+        statisticEditor.putInt("money", this.getMoney());
         statisticEditor.apply();
     }
 
@@ -150,28 +148,29 @@ public class GameStatistic {
     }
 
 
-    public synchronized double getMoney() {
+    public synchronized int getMoney() {
         return money;
     }
 
-    public synchronized void setMoney(double money) {
-        if (money >= 0 && money < 9999999.00) {
+    public synchronized Boolean decreaseMoney(int decreaseBy) {
+        if ((this.money - decreaseBy) < 0)
+            return false;
+
+        this.money -= decreaseBy;
+        if (this.money > 9999999) {
+            this.money = 9999999;
+        }
+        return true;
+
+    }
+    public synchronized void setMoney(int money) {
+        if (money >= 0 && money < 9999999) {
             this.money = money;
 
         }
     }
 
-    public synchronized Boolean decreaseMoney(double decreaseBy) {
-        if ((this.money - decreaseBy) < 0)
-            return false;
 
-        this.money -= decreaseBy;
-        if (this.money > 9999999.00) {
-            this.money = 9999999.00;
-        }
-        return true;
-
-    }
 
 
     public synchronized int getPlayTime() {
@@ -212,9 +211,11 @@ public class GameStatistic {
         return (getHunger() <= 0 || getThirst() <= 0 || getBoredom() <= 0 || getHealth() <= 0);
     }
 
-    public synchronized void wipeStatistic() {
+    public synchronized void wipeStatisticWithOutPlayTime() {
         sharedStatistic.edit().clear().apply();
+        int temp = playTime;
         forcedLoad(); // загружает пустые значения
+        playTime = temp;
     }
 
     public synchronized void writeBestScore() {
@@ -230,6 +231,8 @@ public class GameStatistic {
 
 
     }
-
+    public String getStringMoney(){
+        return Integer.toString(money);
+    }
 
 }

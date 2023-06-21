@@ -41,7 +41,7 @@ public class Game extends Activity {
             TextView emoji = findViewById(R.id.GEnt);
 
 
-            money.setText(Double.toString(gameStatistic.getMoney()));
+            money.setText(gameStatistic.getStringMoney());
 
 
             // элементы интерфейса с показателями персонажа
@@ -50,7 +50,7 @@ public class Game extends Activity {
             while (true) {
                 gameStatistic.modifyAllStatByStatModifier();
                 if (gameStatistic.isDie()) {
-                    gameStatistic.wipeStatistic();
+                    gameStatistic.wipeStatisticWithOutPlayTime();
                     gameStatistic.writeBestScore();
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -113,9 +113,9 @@ public class Game extends Activity {
         GWork.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gameStatistic.decreaseMoney(-1.0);
+                gameStatistic.decreaseMoney(-1);
                 TextView money = findViewById(R.id.GMoney);
-                money.setText(Double.toString(gameStatistic.getMoney()));
+                money.setText(gameStatistic.getStringMoney());
             }
         });
 
@@ -154,7 +154,7 @@ public class Game extends Activity {
     protected void onResume() {
         super.onResume();
         TextView money = findViewById(R.id.GMoney);
-        money.setText(Double.toString(gameStatistic.getMoney()));
+        money.setText(gameStatistic.getStringMoney());
         stopThread = false;
 
         if (!gameStatistic.isDie())
