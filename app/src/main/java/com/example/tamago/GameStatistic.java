@@ -2,13 +2,12 @@ package com.example.tamago;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
+//todo новый рефакторинг отказаться он decreese и ncreese некоторых
 public class GameStatistic {
     public final static Integer MAX_STAT = 100;
     public final static String SHARED_PREFERENCE_STATISTIC = "Statistic";
-
     public final static String SHARED_PREFERENCE_BEST_SCORE = "BestScore";
-    private Integer statModifier;
+    private Integer statModifier = 1;
     private Integer playTime = 0;
     private Integer hunger = MAX_STAT;
     private Integer thirst = MAX_STAT;
@@ -16,7 +15,6 @@ public class GameStatistic {
     private Integer boredom = MAX_STAT;
     private Integer money;
 
-    private Boolean isWasLoaded = false;
 
     public int getTick() {
         return tick;
@@ -37,24 +35,17 @@ public class GameStatistic {
 
     private static GameStatistic instance = null;
 
-    public static synchronized GameStatistic getInstance(Context context) {
+    public static synchronized GameStatistic getInstance() {
         if (instance == null) {
             instance = new GameStatistic();
-            instance.sharedStatistic = context.getSharedPreferences(SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE);
-            instance.sharedBestScore = context.getSharedPreferences(SHARED_PREFERENCE_BEST_SCORE, Context.MODE_PRIVATE);
+            instance.sharedStatistic = MainActivity.getAppContext().getSharedPreferences(SHARED_PREFERENCE_STATISTIC, Context.MODE_PRIVATE);
+            instance.sharedBestScore = MainActivity.getAppContext().getSharedPreferences(SHARED_PREFERENCE_BEST_SCORE, Context.MODE_PRIVATE);
             instance.load();
         }
         return instance;
     }
 
-    public static synchronized GameStatistic getInstance() throws SharedPreferencesNotSetException {
-        if (instance == null) {
-            throw new SharedPreferencesNotSetException();
-        }
-        return instance;
-    }
-
-
+    private Boolean isWasLoaded = false;
     public void forcedLoad() {
         this.setPlayTime(this.sharedStatistic.getInt("playTime", 0));
         this.setHunger(sharedStatistic.getInt("hunger", GameStatistic.MAX_STAT));
@@ -67,9 +58,8 @@ public class GameStatistic {
     }
 
     public void load() {
-        if (!isWasLoaded) {
+        if (!isWasLoaded)
             forcedLoad();
-        }
     }
 
     void save() {
@@ -84,31 +74,31 @@ public class GameStatistic {
     }
 
 
-    public synchronized int getHunger() {
+    public int getHunger() {
         return hunger;
     }
 
-    public synchronized void setHunger(int hunger) {
+    public void setHunger(int hunger) {
         this.hunger = hunger;
     }
 
-    public synchronized void decreaseHunger(int decreaseBy) {
+    public void decreaseHunger(int decreaseBy) {
         this.hunger -= decreaseBy;
-        if (this.hunger > MAX_STAT) {
+        if (this.hunger > MAX_STAT)
             this.hunger = MAX_STAT;
-        }
+
     }
 
 
-    public synchronized int getThirst() {
+    public int getThirst() {
         return thirst;
     }
 
-    public synchronized void setThirst(int thirst) {
+    public void setThirst(int thirst) {
         this.thirst = thirst;
     }
 
-    public synchronized void decreaseThirst(int decreaseBy) {
+    public void decreaseThirst(int decreaseBy) {
         this.thirst -= decreaseBy;
         if (this.thirst > MAX_STAT) {
             this.thirst = MAX_STAT;
@@ -116,15 +106,15 @@ public class GameStatistic {
     }
 
 
-    public synchronized int getBoredom() {
+    public int getBoredom() {
         return boredom;
     }
 
-    public synchronized void setBoredom(int boredom) {
+    public void setBoredom(int boredom) {
         this.boredom = boredom;
     }
 
-    public synchronized void decreaseBoredom(int decreaseBy) {
+    public void decreaseBoredom(int decreaseBy) {
         this.boredom -= decreaseBy;
         if (this.boredom > MAX_STAT) {
             this.boredom = MAX_STAT;
@@ -132,15 +122,15 @@ public class GameStatistic {
     }
 
 
-    public synchronized int getHealth() {
+    public int getHealth() {
         return health;
     }
 
-    public synchronized void setHealth(int health) {
+    public void setHealth(int health) {
         this.health = health;
     }
 
-    public synchronized void decreaseHealth(int decreaseBy) {
+    public void decreaseHealth(int decreaseBy) {
         this.health -= decreaseBy;
         if (this.health > MAX_STAT) {
             this.health = MAX_STAT;
@@ -148,11 +138,11 @@ public class GameStatistic {
     }
 
 
-    public synchronized int getMoney() {
+    public int getMoney() {
         return money;
     }
 
-    public synchronized Boolean decreaseMoney(int decreaseBy) {
+    public Boolean decreaseMoney(int decreaseBy) {
         if ((this.money - decreaseBy) < 0)
             return false;
 
@@ -163,43 +153,43 @@ public class GameStatistic {
         return true;
 
     }
-    public synchronized void setMoney(int money) {
-        if (money >= 0 && money < 9999999) {
+    public void setMoney(int money) {
+        if (money >= 0 && money < 9999999)
             this.money = money;
 
-        }
+
     }
 
 
 
 
-    public synchronized int getPlayTime() {
+    public int getPlayTime() {
         return playTime;
     }
 
-    public synchronized void setPlayTime(int playTime) {
+    public void setPlayTime(int playTime) {
         this.playTime = playTime;
     }
 
-    public synchronized void increasePlayTime(int increaseBY) {
+    public void increasePlayTime(int increaseBY) {
 
         this.playTime += increaseBY;
     }
 
 
-    public synchronized Integer getStatModifier() {
+    public Integer getStatModifier() {
         return statModifier;
     }
 
-    public synchronized void setStatModifier(Integer statModifier) {
+    public void setStatModifier(Integer statModifier) {
         this.statModifier = statModifier;
     }
 
-    public synchronized void increaseStatDecrease(int increaseBY) {
+    public void increaseStatDecrease(int increaseBY) {
         this.statModifier += increaseBY;
     }
 
-    public synchronized void modifyAllStatByStatModifier() {
+    public void modifyAllStatByStatModifier() {
         decreaseBoredom(statModifier);
         decreaseHunger(statModifier);
         decreaseThirst(statModifier);
@@ -207,18 +197,18 @@ public class GameStatistic {
         increasePlayTime(statModifier);
     }
 
-    public synchronized Boolean isDie() {
+    public Boolean isDie() {
         return (getHunger() <= 0 || getThirst() <= 0 || getBoredom() <= 0 || getHealth() <= 0);
     }
 
-    public synchronized void wipeStatisticWithOutPlayTime() {
+    public void wipeStatisticWithOutPlayTime() {
         sharedStatistic.edit().clear().apply();
         int temp = playTime;
         forcedLoad(); // загружает пустые значения
         playTime = temp;
     }
 
-    public synchronized void writeBestScore() {
+    public void writeBestScore() {
         if (getPlayTime() > sharedBestScore.getInt(SHARED_PREFERENCE_BEST_SCORE, 0)) {
             SharedPreferences.Editor editor = sharedBestScore.edit();
             editor.putInt(SHARED_PREFERENCE_BEST_SCORE, getPlayTime());
@@ -226,7 +216,7 @@ public class GameStatistic {
         }
     }
 
-    public synchronized int getWrittenScore() {
+    public int getWrittenScore() {
         return sharedBestScore.getInt(SHARED_PREFERENCE_BEST_SCORE, 0);
 
 

@@ -11,31 +11,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity">
+
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".Game"
-            android:label="game"
-            />
-        <activity android:name=".About"
-            android:label="About"
-            />
-        <activity android:name=".Pause"
-            android:label="Pause"
-            />
-        <activity android:name=".DFshop"
-            android:label="DFshop"
-            />
-        <activity android:name=".Hshop"
-            android:label="Hshop"
-            />
+        <activity android:name=".GameActivity" />
+        <activity android:name=".AboutActivity" />
+        <activity android:name=".PauseActivity" />
+        <activity android:name=".FoodShopActivity" />
+        <activity android:name=".GeneralShopActivity" />
+
 
     </application>
-
-
 </manifest>

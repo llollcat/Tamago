@@ -1,46 +1,33 @@
 package com.example.tamago;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
-
-
-    @Override
-    public void onBackPressed() {// отключение кнопки назад
-    }
-
+    private static Context context = null;
     @SuppressLint({"SetTextI18n", "SourceLockedOrientationActivity"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-            supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        GameStatistic.getInstance(getApplicationContext());
-
         setContentView(R.layout.mm);
+
+        context = getApplicationContext();
 
         Button MMStart = findViewById(R.id.MMStart);
         MMStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Game.class);
+                Intent intent = new Intent(MainActivity.this, GameActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -48,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         Reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GameStatistic gameStatistic = GameStatistic.getInstance(getApplicationContext());
+                GameStatistic gameStatistic = GameStatistic.getInstance();
                 gameStatistic.wipeStatisticWithOutPlayTime();
 
                 Toast.makeText(getApplicationContext(), R.string.Reseted, Toast.LENGTH_LONG).show();
@@ -60,15 +47,18 @@ public class MainActivity extends AppCompatActivity {
         MMAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, About.class);
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(intent);
             }
         });
         TextView best = findViewById(R.id.bestr);
         // Установка лучшего результата
-        GameStatistic gameStatistic = GameStatistic.getInstance(getApplicationContext());
+        GameStatistic gameStatistic = GameStatistic.getInstance();
         best.setText(Integer.toString(gameStatistic.getWrittenScore()));
 
-
     }
+    public static Context getAppContext() {
+        return context;
+    }
+
 }
