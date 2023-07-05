@@ -1,20 +1,19 @@
 package com.example.tamago;
 
 
-import android.annotation.SuppressLint;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Locale;
 
 
 public class GameActivity extends Activity {
     GameStatistic gameStatistic;
-
     protected TextView money;
     protected ProgressBar GHunger;
     protected ProgressBar GThirst;
@@ -25,62 +24,49 @@ public class GameActivity extends Activity {
 
 
     //Тред, который выполняет все основные операции
-
-    Boolean stopThread = false;
+    private Boolean stopThread = false;
     Thread mainThread = new Thread(new Runnable() {
-        @SuppressLint("SetTextI18n")
         @Override
         public void run() {
-
-
             // элементы интерфейса с показателями персонажа
-
-
-            while (true) {
+            while (!gameStatistic.isDie()) {
                 gameStatistic.modifyAllStatByStatModifier();
-                if (gameStatistic.isDie()) {
-                    gameStatistic.writeBestScore();
-                    gameStatistic.wipeStatisticWithOutPlayTime();
-                    gameStatistic.setPlayTime(0);
 
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), R.string.End, Toast.LENGTH_LONG).show();
-                            finish();
-                        }
-                    });
-                    startActivity(new Intent(GameActivity.this, MainActivity.class));
-                    break;
-                }
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        GBoredom.setProgress(gameStatistic.getBoredom());
-                        GHunger.setProgress(gameStatistic.getHunger());
-                        GThirst.setProgress(gameStatistic.getThirst());
-                        GHealth.setProgress(gameStatistic.getHealth());
-                        time.setText((Integer.toString(gameStatistic.getPlayTime())));
-                        emoji.setText(Mood.getMood(gameStatistic));
-                    }
+                runOnUiThread(() -> {
+                    GBoredom.setProgress(gameStatistic.getBoredom());
+                    GHunger.setProgress(gameStatistic.getHunger());
+                    GThirst.setProgress(gameStatistic.getThirst());
+                    GHealth.setProgress(gameStatistic.getHealth());
+
+                    time.setText(String.format(Locale.getDefault(), "%d", gameStatistic.getPlayTime()));
+                    emoji.setText(Mood.getMood(gameStatistic));
                 });
 
 
-                if (gameStatistic.getTick() >= 60 * gameStatistic.getStatModifier())
-                    gameStatistic.increaseStatDecrease(1);
-
-                gameStatistic.increaseTickByOne();
+                if (gameStatistic.getPlayTime() >= 60 * gameStatistic.getStatModifier())
+                    gameStatistic.setStatModifier(gameStatistic.getStatModifier()+1);
 
 
-                do {
-                    try {
+                try {
+                    do {
                         Thread.sleep(1000);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } while (stopThread);
-
+                    } while (stopThread);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    finish();
+                    System.exit(0);
+                }
 
             }
+            // Когда персонаж умер
+            gameStatistic.writeBestScore();
+            gameStatistic.wipeAllStatistic();
+            runOnUiThread(() -> {
+                Toast.makeText(getApplicationContext(), R.string.End, Toast.LENGTH_LONG).show();
+                finish();
+            });
+            startActivity(new Intent(GameActivity.this, MainActivity.class));
+
         }
     });
 
@@ -88,60 +74,40 @@ public class GameActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.maingame);
-        this.money = findViewById(R.id.GMoney);
-        this.GHunger = findViewById(R.id.GHunger);
-        this.GThirst = findViewById(R.id.GThirst);
-        this.GHealth = findViewById(R.id.GHealth);
-        this.GBoredom = findViewById(R.id.GBoredom);
-        this.time = findViewById(R.id.GTime);
-        this.emoji = findViewById(R.id.GEnt);
+        setContentView(R.layout.main_game);
+        this.money = findViewById(R.id.money_textView);
+        this.GHunger = findViewById(R.id.hunger_progressBar);
+        this.GThirst = findViewById(R.id.thirst_progressBar);
+        this.GHealth = findViewById(R.id.health_progressBar);
+        this.GBoredom = findViewById(R.id.boredom_progressBar);
+        this.time = findViewById(R.id.time_textView);
+        this.emoji = findViewById(R.id.tamago_condition_textView);
 
 
         gameStatistic = GameStatistic.getInstance();
         mainThread.start();
 
-//        getActionBar().
-        ImageButton GWork = findViewById(R.id.GWork);
-        GWork.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                gameStatistic.decreaseMoney(-1);
-                TextView money = findViewById(R.id.GMoney);
-                money.setText(gameStatistic.getStringMoney());
-            }
+
+        ImageButton GWork = findViewById(R.id.work_ImageButton);
+        GWork.setOnClickListener(view -> {
+            gameStatistic.setMoney(gameStatistic.getMoney()+1);
+            money.setText(String.format(Locale.getDefault(), "%d", gameStatistic.getMoney()));
         });
 
 
-        ImageButton GSFood = findViewById(R.id.GSFood);
-        GSFood.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(GameActivity.this, FoodShopActivity.class));
-            }
-        });
+        ImageButton GSFood = findViewById(R.id.sho_food_imageButton);
+        GSFood.setOnClickListener(view -> startActivity(new Intent(GameActivity.this, ShopFoodActivity.class)));
 
 
-        ImageButton GSHealth = findViewById(R.id.GSHealth);
-        GSHealth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(GameActivity.this, GeneralShopActivity.class));
-            }
-        });
+        ImageButton GSHealth = findViewById(R.id.shop_general_imageButton);
+        GSHealth.setOnClickListener(view -> startActivity(new Intent(GameActivity.this, ShopGeneralActivity.class)));
 
 
-        ImageButton GPause = findViewById(R.id.GPause);
-        GPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(GameActivity.this, PauseActivity.class));
-            }
-        });
+        ImageButton GPause = findViewById(R.id.pause_imageButton);
+        GPause.setOnClickListener(view -> startActivity(new Intent(GameActivity.this, PauseActivity.class)));
     }
 
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onResume() {
         super.onResume();
@@ -149,9 +115,9 @@ public class GameActivity extends Activity {
         GHunger.setProgress(gameStatistic.getHunger());
         GThirst.setProgress(gameStatistic.getThirst());
         GHealth.setProgress(gameStatistic.getHealth());
-        time.setText((Integer.toString(gameStatistic.getPlayTime())));
+        time.setText(String.format(Locale.getDefault(), "%d", gameStatistic.getPlayTime()));
         emoji.setText(Mood.getMood(gameStatistic));
-        money.setText(gameStatistic.getStringMoney());
+        money.setText(String.format(Locale.getDefault(), "%d", gameStatistic.getMoney()));
 
         stopThread = false;
 

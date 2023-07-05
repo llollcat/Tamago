@@ -26,8 +26,8 @@
         <activity android:name=".GameActivity" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".PauseActivity" />
-        <activity android:name=".FoodShopActivity" />
-        <activity android:name=".GeneralShopActivity" />
+        <activity android:name=".ShopFoodActivity" />
+        <activity android:name=".ShopGeneralActivity" />
 
 
     </application>

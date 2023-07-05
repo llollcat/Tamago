@@ -30,8 +30,6 @@ public class Mood {
             return normal;
 
         return joy;
-
     }
-
 }
 

@@ -2,31 +2,14 @@ package com.example.tamago;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-//todo новый рефакторинг отказаться он decreese и ncreese некоторых
+
+
 public class GameStatistic {
     public final static Integer MAX_STAT = 100;
     public final static String SHARED_PREFERENCE_STATISTIC = "Statistic";
     public final static String SHARED_PREFERENCE_BEST_SCORE = "BestScore";
-    private Integer statModifier = 1;
-    private Integer playTime = 0;
-    private Integer hunger = MAX_STAT;
-    private Integer thirst = MAX_STAT;
-    private Integer health = MAX_STAT;
-    private Integer boredom = MAX_STAT;
-    private Integer money;
 
 
-    public int getTick() {
-        return tick;
-    }
-    public void increaseTickByOne() {
-        ++tick;
-    }
-    public void setTick(int tick) {
-        this.tick = tick;
-    }
-
-    private int tick = 1;
     private GameStatistic() {
     }
 
@@ -45,7 +28,9 @@ public class GameStatistic {
         return instance;
     }
 
+
     private Boolean isWasLoaded = false;
+
     public void forcedLoad() {
         this.setPlayTime(this.sharedStatistic.getInt("playTime", 0));
         this.setHunger(sharedStatistic.getInt("hunger", GameStatistic.MAX_STAT));
@@ -57,7 +42,7 @@ public class GameStatistic {
         isWasLoaded = true;
     }
 
-    public void load() {
+    protected void load() {
         if (!isWasLoaded)
             forcedLoad();
     }
@@ -74,108 +59,73 @@ public class GameStatistic {
     }
 
 
-    public int getHunger() {
+    private Integer hunger = MAX_STAT;
+
+    public Integer getHunger() {
         return hunger;
     }
 
-    public void setHunger(int hunger) {
+    public void setHunger(Integer hunger) {
         this.hunger = hunger;
     }
 
-    public void decreaseHunger(int decreaseBy) {
-        this.hunger -= decreaseBy;
-        if (this.hunger > MAX_STAT)
-            this.hunger = MAX_STAT;
 
-    }
+    private Integer thirst = MAX_STAT;
 
-
-    public int getThirst() {
+    public Integer getThirst() {
         return thirst;
     }
 
-    public void setThirst(int thirst) {
+    public void setThirst(Integer thirst) {
         this.thirst = thirst;
     }
 
-    public void decreaseThirst(int decreaseBy) {
-        this.thirst -= decreaseBy;
-        if (this.thirst > MAX_STAT) {
-            this.thirst = MAX_STAT;
-        }
-    }
 
+    private Integer boredom = MAX_STAT;
 
-    public int getBoredom() {
+    public Integer getBoredom() {
         return boredom;
     }
 
-    public void setBoredom(int boredom) {
+    public void setBoredom(Integer boredom) {
         this.boredom = boredom;
     }
 
-    public void decreaseBoredom(int decreaseBy) {
-        this.boredom -= decreaseBy;
-        if (this.boredom > MAX_STAT) {
-            this.boredom = MAX_STAT;
-        }
-    }
 
+    private Integer health = MAX_STAT;
 
-    public int getHealth() {
+    public Integer getHealth() {
         return health;
     }
 
-    public void setHealth(int health) {
+    public void setHealth(Integer health) {
         this.health = health;
     }
 
-    public void decreaseHealth(int decreaseBy) {
-        this.health -= decreaseBy;
-        if (this.health > MAX_STAT) {
-            this.health = MAX_STAT;
-        }
-    }
 
+    private Integer money;
 
-    public int getMoney() {
+    public Integer getMoney() {
         return money;
     }
 
-    public Boolean decreaseMoney(int decreaseBy) {
-        if ((this.money - decreaseBy) < 0)
-            return false;
-
-        this.money -= decreaseBy;
-        if (this.money > 9999999) {
-            this.money = 9999999;
-        }
-        return true;
-
-    }
-    public void setMoney(int money) {
+    public void setMoney(Integer money) {
         if (money >= 0 && money < 9999999)
             this.money = money;
-
-
     }
 
 
+    private Integer playTime = 0;
 
-
-    public int getPlayTime() {
+    public Integer getPlayTime() {
         return playTime;
     }
 
-    public void setPlayTime(int playTime) {
+    public void setPlayTime(Integer playTime) {
         this.playTime = playTime;
     }
 
-    public void increasePlayTime(int increaseBY) {
-
-        this.playTime += increaseBY;
-    }
-
+    private Integer statModifier = 1;
 
     public Integer getStatModifier() {
         return statModifier;
@@ -185,28 +135,21 @@ public class GameStatistic {
         this.statModifier = statModifier;
     }
 
-    public void increaseStatDecrease(int increaseBY) {
-        this.statModifier += increaseBY;
-    }
-
     public void modifyAllStatByStatModifier() {
-        decreaseBoredom(statModifier);
-        decreaseHunger(statModifier);
-        decreaseThirst(statModifier);
-        decreaseHealth(statModifier);
-        increasePlayTime(statModifier);
+        setBoredom(getBoredom() - statModifier);
+        setHunger(getHunger() - statModifier);
+        setThirst(getThirst() - statModifier);
+        setHealth(getHealth() - statModifier);
+        setPlayTime(getPlayTime() + statModifier);
     }
 
-    public Boolean isDie() {
-        return (getHunger() <= 0 || getThirst() <= 0 || getBoredom() <= 0 || getHealth() <= 0);
-    }
 
-    public void wipeStatisticWithOutPlayTime() {
+    public void wipeAllStatistic() {
         sharedStatistic.edit().clear().apply();
-        int temp = playTime;
-        forcedLoad(); // загружает пустые значения
-        playTime = temp;
+        // загружает пустые значения
+        forcedLoad();
     }
+
 
     public void writeBestScore() {
         if (getPlayTime() > sharedBestScore.getInt(SHARED_PREFERENCE_BEST_SCORE, 0)) {
@@ -216,13 +159,13 @@ public class GameStatistic {
         }
     }
 
-    public int getWrittenScore() {
+
+    public Integer getWrittenScore() {
         return sharedBestScore.getInt(SHARED_PREFERENCE_BEST_SCORE, 0);
-
-
-    }
-    public String getStringMoney(){
-        return Integer.toString(money);
     }
 
+
+    public Boolean isDie() {
+        return (getHunger() <= 0 || getThirst() <= 0 || getBoredom() <= 0 || getHealth() <= 0);
+    }
 }
