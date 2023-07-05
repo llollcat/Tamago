@@ -19,10 +19,7 @@
         android:autoLink="web"
         android:text="material.io"
         android:textColor="@android:color/white"
-        android:textSize="48sp"
-
-
-        />
+        android:textSize="48sp" />
 
 
 </LinearLayout>
